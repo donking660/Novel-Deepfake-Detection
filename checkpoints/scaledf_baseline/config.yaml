@@ -1,0 +1,48 @@
+data:
+  data_root: /data/zhanzhijie/DATASETS_POOL/deepfakes_detection_datasets/ScaleDF/train
+  num_workers: 4
+  resolution: 224
+  train_ratio: 0.9
+data_aug:
+  jpeg_quality_lower: 40
+  jpeg_quality_upper: 100
+device: 0
+ema:
+  decay: 0.999
+  enabled: true
+experiment:
+  description: 'ScaleDF Baseline: CLIP ViT-L/14 + Adapter, 无平衡采样'
+  name: scaledf_baseline
+model:
+  adapter:
+    bottleneck_dim: 128
+    dropout: 0.2
+    init_scale: 0.05
+    layers:
+    - 2
+    - 5
+    - 8
+    - 11
+    - 14
+    - 17
+    - 20
+    - 23
+  backbone: clip_vit_l14
+optimizer:
+  label_smoothing: 0.1
+  lr: 5.0e-05
+  type: adamw
+  weight_decay: 0.01
+output:
+  log_dir: logs/scaledf_baseline
+  save_dir: checkpoints/scaledf_baseline
+train:
+  batch_size: 96
+  epochs: 100
+  patience: 10
+  save_freq: 10
+  seed: 42
+  warmup_epochs: 5
+wandb:
+  enabled: false
+  project: deepfake-detection

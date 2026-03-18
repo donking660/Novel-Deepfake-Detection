@@ -1,0 +1,26 @@
+{
+  "test_set": "closed_set",
+  "config_path": "/data/zhanzhijie/WORKSPACE_CODE/test_closed_set_config.json",
+  "checkpoint": "checkpoints/df40_style/best_auc_model.pth",
+  "stats": {
+    "total": 103067,
+    "real": 4479,
+    "fake": 98588
+  },
+  "metrics": {
+    "ACC": 0.9901326321713061,
+    "Precision": 0.9985488733329927,
+    "Recall": 0.9911246804884976,
+    "F1": 0.9948229257341824,
+    "AUC": 0.9973462259644699,
+    "AP": 0.9998627486821382,
+    "EER": 0.017649206800034376,
+    "HTER": 0.017643536197507553,
+    "TPR@FPR=1%": 0.9705035095549154,
+    "TP": 97713,
+    "TN": 4337,
+    "FP": 142,
+    "FN": 875
+  },
+  "experiment": "df40_style"
+}

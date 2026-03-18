@@ -1,0 +1,27 @@
+# ===== 模型权重 =====
+*.pth
+*.pt
+*.ckpt
+*.bin
+*.safetensors
+*.h5
+
+# ===== 日志 =====
+logs/
+*.log
+
+# ===== Weights & Biases =====
+wandb/
+
+# ===== Python 缓存 =====
+__pycache__/
+*.pyc
+*.pyo
+
+# ===== 大型数据文件 =====
+*.npz
+
+# ===== 其他 =====
+.DS_Store
+*.swp
+*.swo

@@ -1,0 +1,114 @@
+# ============================================================================
+# ScaleDF Region-Aware Adapter 配置
+#
+# 在 ScaleDF 数据集上训练 Region-Aware Adapter 模型
+#
+# 数据集: ScaleDF (90/10 split, 1/10 subsample)
+# 模型:   CLIP ViT-L/14 + RegionAdapter (face/boundary/background)
+# 增强:   Resize -> JPEG(40~100) -> RandomPerturbationInjection (掩膜同步)
+#
+# 使用方法:
+#   python tools/train_scaledf_with_mask.py --config configs/scaledf_region_adapter.yaml
+# ============================================================================
+
+# ======================== 实验信息 ========================
+experiment:
+  name: scaledf_region_adapter
+  description: "ScaleDF + Region-Aware Adapter: face/boundary/background separate convolution"
+
+# ======================== 数据配置 ========================
+data:
+  # ScaleDF 训练集根目录 (下含子文件夹, 000000开头为真实)
+  data_root: /data/zhanzhijie/DATASETS_POOL/deepfakes_detection_datasets/ScaleDF/train
+  # 训练集占比 (每个子文件夹内 90% 训练 / 10% 验证)
+  train_ratio: 0.9
+  # 输入图像分辨率 (CLIP ViT-L/14 需要 224)
+  resolution: 224
+  # 数据加载线程数
+  num_workers: 4
+
+# ======================== 数据增强配置 ========================
+data_aug:
+  # JPEG 压缩质量范围
+  jpeg_quality_lower: 40
+  jpeg_quality_upper: 100
+
+# ======================== 模型配置 ========================
+model:
+  # Backbone 类型
+  backbone: clip_vit_l14
+
+  # 适配器配置
+  adapter:
+    # 适配器类型: 'standard' | 'region_adapter'
+    type: region_adapter
+    # 插入适配器的层索引 (ViT-L/14 共24层, 索引0-23)
+    layers: [2, 5, 8, 11, 14, 17, 20, 23]
+    # 瓶颈层维度 (每个分支)
+    bottleneck_dim: 128
+    # Dropout 概率
+    dropout: 0.2
+    # 每个分支的初始 scale 值
+    init_scale: 0.01
+    # scale 是否可训练 (true: nn.Parameter, false: 固定常数)
+    scale_trainable: true
+
+# ======================== 掩膜配置 ========================
+mask:
+  # 是否启用面部掩膜 (region_adapter 需要)
+  enabled: true
+  # 腐蚀/膨胀核大小: 19 → 每侧 ~9 像素, 边界带 ~18px (224x224), ~1.3px (16x16)
+  erosion_kernel_size: 19
+  # 特征图空间分辨率: ViT-L/14 的 224/14 = 16
+  feature_map_size: 16
+
+# ======================== 训练配置 ========================
+train:
+  # 批量大小
+  batch_size: 96
+  # 最大训练轮数
+  epochs: 100
+  # Warmup 轮数
+  warmup_epochs: 5
+  # Early Stopping 容忍轮数
+  patience: 10
+  # Checkpoint 保存频率
+  save_freq: 10
+  # 随机种子
+  seed: 42
+
+# ======================== 优化器配置 ========================
+optimizer:
+  # 优化器类型: 'adamw' | 'adam' | 'sgd'
+  type: adamw
+  # 初始学习率
+  lr: 3.0e-5
+  # 权重衰减
+  weight_decay: 0.01
+  # Label Smoothing
+  label_smoothing: 0.1
+
+# ======================== EMA 配置 ========================
+ema:
+  # 是否启用 EMA
+  enabled: true
+  # EMA 衰减系数
+  decay: 0.999
+
+# ======================== 输出配置 ========================
+output:
+  # 模型保存目录
+  save_dir: checkpoints/scaledf_region_adapter
+  # 日志保存目录
+  log_dir: logs/scaledf_region_adapter
+
+# ======================== 设备配置 ========================
+# GPU ID
+device: 0
+
+# ======================== WandB 配置 ========================
+wandb:
+  # 是否启用 (可通过命令行 --use_wandb 覆盖)
+  enabled: false
+  # 项目名称
+  project: deepfake-detection

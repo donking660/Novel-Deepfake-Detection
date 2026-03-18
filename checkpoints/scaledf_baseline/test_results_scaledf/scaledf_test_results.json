@@ -1,0 +1,97 @@
+{
+  "experiment": "scaledf_baseline",
+  "checkpoint": "checkpoints/scaledf_baseline/best_auc_model.pth",
+  "test_root": "/data/zhanzhijie/DATASETS_POOL/deepfakes_detection_datasets/ScaleDF/val",
+  "timestamp": "20260308_211553",
+  "device": "cuda:0",
+  "stats": {
+    "total": 89729,
+    "real": 19729,
+    "fake": 70000
+  },
+  "metrics": {
+    "AUC": 0.9797018363105796,
+    "ACC": 0.8953069799061619,
+    "AP": 0.9942900065880769,
+    "EER": 0.07430685792489103,
+    "Precision": 0.988490182802979,
+    "Recall": 0.876,
+    "F1": 0.9288516594210582,
+    "TP": 61320,
+    "TN": 19015,
+    "FP": 714,
+    "FN": 8680
+  },
+  "per_method": {
+    "3dSwap_faces": {
+      "AUC": 0.999998307060672,
+      "ACC": 0.9711270168627927,
+      "count": 5000
+    },
+    "DiffFace_faces": {
+      "AUC": 0.9671271478534137,
+      "ACC": 0.9408386914149379,
+      "count": 5000
+    },
+    "EDTalk_faces": {
+      "AUC": 0.9987478077956308,
+      "ACC": 0.9695499211452141,
+      "count": 5000
+    },
+    "G3FA_faces": {
+      "AUC": 0.9787400881950428,
+      "ACC": 0.9418900885599903,
+      "count": 5000
+    },
+    "KDTalker_faces": {
+      "AUC": 0.9834317198033352,
+      "ACC": 0.949775567147883,
+      "count": 5000
+    },
+    "SkyReelsA1_faces": {
+      "AUC": 0.9597128186932942,
+      "ACC": 0.9119657082777306,
+      "count": 5000
+    },
+    "Step1XEdit_faces": {
+      "AUC": 0.9569925591768462,
+      "ACC": 0.9362287193174006,
+      "count": 5000
+    },
+    "TPSMM_faces": {
+      "AUC": 0.9811089563586599,
+      "ACC": 0.9433458692223705,
+      "count": 5000
+    },
+    "cogvideox_5b_faces": {
+      "AUC": 0.9543813979421155,
+      "ACC": 0.9059808322212787,
+      "count": 5000
+    },
+    "float_faces": {
+      "AUC": 0.9710963505499518,
+      "ACC": 0.9363095960208662,
+      "count": 5000
+    },
+    "gpt-image-1_faces": {
+      "AUC": 0.9700625829996452,
+      "ACC": 0.9321040074406567,
+      "count": 5000
+    },
+    "simplear_faces": {
+      "AUC": 0.9999472350347205,
+      "ACC": 0.9710865785110598,
+      "count": 5000
+    },
+    "triplane_faces": {
+      "AUC": 0.9999851893152212,
+      "ACC": 0.9711270168627927,
+      "count": 5000
+    },
+    "vqgan_faces": {
+      "AUC": 0.9944935475695676,
+      "ACC": 0.9634437300335639,
+      "count": 5000
+    }
+  }
+}

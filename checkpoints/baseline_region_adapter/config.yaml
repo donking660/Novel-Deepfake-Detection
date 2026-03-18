@@ -1,0 +1,72 @@
+data:
+  balance_mode: dynamic
+  data_root: /data/zhanzhijie/DATASETS_POOL/deepfakes_detection_datasets
+  num_workers: 4
+  resolution: 224
+  train_json: /data/zhanzhijie/WORKSPACE_CODE/training_dataset_config.json
+  val_json: null
+  with_face_mask: true
+data_aug:
+  blur_limit:
+  - 3
+  - 7
+  blur_prob: 0.5
+  brightness_limit:
+  - -0.1
+  - 0.1
+  contrast_limit:
+  - -0.1
+  - 0.1
+  flip_prob: 0.5
+  quality_lower: 40
+  quality_upper: 100
+  rotate_limit:
+  - -10
+  - 10
+  rotate_prob: 0.5
+device: 0
+ema:
+  decay: 0.999
+  enabled: true
+experiment:
+  description: 'Region-Aware Adapter: face/boundary/background separate convolution'
+  name: df40_region_adapter
+mask:
+  enabled: true
+  erosion_kernel_size: 19
+  feature_map_size: 16
+model:
+  adapter:
+    bottleneck_dim: 128
+    dropout: 0.2
+    init_scale: 0.01
+    layers:
+    - 2
+    - 5
+    - 8
+    - 11
+    - 14
+    - 17
+    - 20
+    - 23
+    scale_trainable: true
+    type: region_adapter
+  backbone: clip_vit_l14
+optimizer:
+  label_smoothing: 0.1
+  lr: 3.0e-05
+  type: adamw
+  weight_decay: 0.01
+output:
+  log_dir: logs/baseline_region_adapter
+  save_dir: checkpoints/baseline_region_adapter
+train:
+  batch_size: 64
+  epochs: 100
+  patience: 10
+  save_freq: 10
+  seed: 42
+  warmup_epochs: 5
+wandb:
+  enabled: false
+  project: deepfake-detection

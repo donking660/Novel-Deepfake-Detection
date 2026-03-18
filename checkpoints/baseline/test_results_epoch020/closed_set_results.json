@@ -1,0 +1,26 @@
+{
+  "test_set": "closed_set",
+  "config_path": "/data/zhanzhijie/WORKSPACE_CODE/test_closed_set_config.json",
+  "checkpoint": "/data/zhanzhijie/WORKSPACE_CODE/1_My_Novel_Method/checkpoints/df40_style/checkpoint_epoch020.pth",
+  "stats": {
+    "total": 103067,
+    "real": 4479,
+    "fake": 98588
+  },
+  "metrics": {
+    "ACC": 0.9778202528452365,
+    "Precision": 0.9989740932642487,
+    "Recall": 0.9778167728323934,
+    "F1": 0.9882822111047322,
+    "AUC": 0.9953023100558088,
+    "AP": 0.9997473072680982,
+    "EER": 0.02215279750070997,
+    "HTER": 0.022127972762411276,
+    "TPR@FPR=1%": 0.9536353308719114,
+    "TP": 96401,
+    "TN": 4380,
+    "FP": 99,
+    "FN": 2187
+  },
+  "experiment": "df40_style"
+}

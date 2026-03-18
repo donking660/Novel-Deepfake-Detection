@@ -1,0 +1,26 @@
+{
+  "test_set": "openset4",
+  "config_path": "/data/zhanzhijie/WORKSPACE_CODE/test_openset4_config.json",
+  "checkpoint": "/data/zhanzhijie/WORKSPACE_CODE/1_My_Novel_Method/checkpoints/df40_style/checkpoint_epoch020.pth",
+  "stats": {
+    "total": 14810,
+    "real": 9083,
+    "fake": 5727
+  },
+  "metrics": {
+    "ACC": 0.72424037812289,
+    "Precision": 0.6153630108130881,
+    "Recall": 0.7651475467085734,
+    "F1": 0.6821295143212951,
+    "AUC": 0.8111282903082203,
+    "AP": 0.8122433459355445,
+    "EER": 0.2514587691296414,
+    "HTER": 0.2514496569584947,
+    "TPR@FPR=1%": 0.3605727256853501,
+    "TP": 4382,
+    "TN": 6344,
+    "FP": 2739,
+    "FN": 1345
+  },
+  "experiment": "df40_style"
+}
