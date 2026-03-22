@@ -198,6 +198,57 @@ class CLIPViTBackbone(nn.Module):
         
         return x
     
+    def forward_with_spatial(self, x: torch.Tensor, region_masks: Optional[torch.Tensor] = None):
+        """
+        视觉编码器前向传播，返回 CLS token 和空间特征
+        
+        与 forward_visual 逻辑完全一致，但额外返回最后一层的空间特征 (patch tokens)。
+        CLS token 经过 ln_post，空间特征保持原样 (与 DeMo 的 global/cash 对应)。
+        
+        Args:
+            x: 输入图像，形状为 (B, 3, 224, 224)，已转换为 CLIP dtype
+            region_masks: 区域掩膜 (仅 region_adapter 需要)，形状为 (B, 3, 16, 16)
+        Returns:
+            cls_token: (B, 1024) — 经过 ln_post 的 CLS token
+            spatial_tokens: (B, 256, 1024) — 最后一层的 patch token 序列 (未经 ln_post)
+        """
+        vit = self.visual
+        
+        # Patch Embedding
+        x = vit.conv1(x)
+        x = x.reshape(x.shape[0], x.shape[1], -1)
+        x = x.permute(0, 2, 1)
+        
+        # 添加 class token
+        class_token = vit.class_embedding.to(x.dtype) + torch.zeros(
+            x.shape[0], 1, x.shape[-1], dtype=x.dtype, device=x.device
+        )
+        x = torch.cat([class_token, x], dim=1)
+        
+        # 位置编码
+        x = x + vit.positional_embedding.to(x.dtype)
+        
+        # Layer Norm (pre)
+        x = vit.ln_pre(x)
+        
+        # Permute for transformer: (B, L, D) -> (L, B, D)
+        x = x.permute(1, 0, 2)
+        
+        # 逐层通过 Transformer blocks
+        for layer_idx, block in enumerate(vit.transformer.resblocks):
+            x = block(x)
+            if layer_idx in self.adapter_layers:
+                x = self._apply_adapter(x, layer_idx, region_masks)
+        
+        # Permute back: (L, B, D) -> (B, L, D)
+        x = x.permute(1, 0, 2)  # (B, 257, 1024)
+        
+        # 分离 CLS token 和空间特征
+        spatial_tokens = x[:, 1:, :]        # (B, 256, 1024) — 不经过 ln_post
+        cls_token = vit.ln_post(x[:, 0, :])  # (B, 1024) — 经过 ln_post
+        
+        return cls_token, spatial_tokens
+    
     def forward(self, images: torch.Tensor, region_masks: Optional[torch.Tensor] = None) -> torch.Tensor:
         """
         前向传播
@@ -209,6 +260,19 @@ class CLIPViTBackbone(nn.Module):
             图像特征: (B, 1024)
         """
         return self.forward_visual(images.type(self.clip_model.dtype), region_masks)
+    
+    def forward_dual(self, images: torch.Tensor, region_masks: Optional[torch.Tensor] = None):
+        """
+        前向传播，同时返回 CLS token 和空间特征
+        
+        Args:
+            images: 输入图像，形状为 (B, 3, 224, 224)
+            region_masks: 区域掩膜，形状为 (B, 3, 16, 16)
+        Returns:
+            cls_token: (B, 1024)
+            spatial_tokens: (B, 256, 1024)
+        """
+        return self.forward_with_spatial(images.type(self.clip_model.dtype), region_masks)
     
     def get_trainable_parameters(self):
         """

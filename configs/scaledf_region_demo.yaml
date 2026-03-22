@@ -1,0 +1,100 @@
+# ============================================================================
+# ScaleDF Region-Decoupled MoE (RegionDeMo) 配置 — 消融实验 3
+#
+# 在消融实验 2 (Region-Aware Adapter) 基础上增加:
+#   - 区域特征提取: CLIP 最后一层 spatial tokens + 掩膜池化
+#   - 层次化解耦模块 (HDM): 3 → 7 向量
+#   - CLS 引导混合专家层 (CLS-Guided MoE): 7 选 1 路由 + 二分类
+#
+# 数据集: ScaleDF (90/10 split, 1/10 subsample)
+# 模型:   CLIP ViT-L/14 + RegionAdapter + HDM + CLS-Guided MoE
+# 增强:   Resize -> JPEG(40~100) -> RandomPerturbationInjection (掩膜同步)
+#
+# 使用方法:
+#   python tools/train_scaledf_region_demo.py --config configs/scaledf_region_demo.yaml
+# ============================================================================
+
+# ======================== 实验信息 ========================
+experiment:
+  name: scaledf_region_demo
+  description: "ScaleDF + Region-Decoupled MoE: HDM(3→7) + CLS-Guided MoE + binary classification"
+
+# ======================== 数据配置 ========================
+data:
+  data_root: /data/zhanzhijie/DATASETS_POOL/deepfakes_detection_datasets/ScaleDF/train
+  train_ratio: 0.9
+  resolution: 224
+  num_workers: 4
+
+# ======================== 数据增强配置 ========================
+data_aug:
+  jpeg_quality_lower: 40
+  jpeg_quality_upper: 100
+
+# ======================== 模型配置 ========================
+model:
+  backbone: clip_vit_l14
+
+  # RegionAdapter 配置 (与消融实验 2 保持一致)
+  adapter:
+    type: region_adapter
+    layers: [2, 5, 8, 11, 14, 17, 20, 23]
+    bottleneck_dim: 128
+    dropout: 0.2
+    init_scale: 0.01
+    scale_trainable: true
+
+  # 特征维度 (CLIP ViT-L/14 = 1024)
+  feat_dim: 1024
+  # 特征图空间分辨率 (224/14 = 16)
+  grid_size: 16
+
+  # HDM (层次化解耦模块) 配置
+  hdm:
+    num_heads: 16
+    dropout: 0.1
+
+  # CLS-Guided MoE 配置
+  moe:
+    num_experts: 7
+    num_heads: 16
+
+# ======================== 掩膜配置 ========================
+mask:
+  enabled: true
+  erosion_kernel_size: 19
+  feature_map_size: 16
+
+# ======================== 训练配置 ========================
+train:
+  batch_size: 64
+  epochs: 100
+  warmup_epochs: 5
+  patience: 10
+  save_freq: 10
+  seed: 42
+
+# ======================== 优化器配置 ========================
+optimizer:
+  type: adamw
+  lr: 3.0e-5
+  weight_decay: 0.01
+  label_smoothing: 0.1
+
+# ======================== EMA 配置 ========================
+ema:
+  enabled: true
+  decay: 0.999
+
+# ======================== 输出配置 ========================
+output:
+  save_dir: checkpoints/scaledf_region_demo
+  log_dir: logs/scaledf_region_demo
+
+# ======================== 设备配置 ========================
+device: 0
+
+# ======================== WandB 配置 ========================
+wandb:
+  enabled: false
+  project: deepfake-detection
